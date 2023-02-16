@@ -452,3 +452,13 @@ def find_and_fire_hook(event_name, instance, **kwargs):
     for hook in hooks:
         hook.deliver_hook(instance)
 ```
+
+# Test of Mermaid Sequence Diagrams
+
+
+```mermaid
+sequenceDiagram
+    Alice->>John: Hello John, how are you?
+    John-->>Alice: Great!
+    Alice-)John: See you later!
+```
