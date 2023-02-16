@@ -455,10 +455,20 @@ def find_and_fire_hook(event_name, instance, **kwargs):
 
 # Test of Mermaid Sequence Diagrams
 
-
 ```mermaid
 sequenceDiagram
-    Alice->>John: Hello John, how are you?
+    Startup->>AgParse: configure
+    argparse->>settings["external_plugins"]: configure external plugins
+    argparse->>settings["blocked_plugins"]: configure blocked plugins
+    StartUp->>DefaultContext:  build_context()
+    DefaultContext->>DefaultContext:  load_plugins()
+    DefaultContext->>PluginRegistry:  register_package() (for built-in protocols)
+    DefaultContext->>PluginRegistry:  register_plugin() (for non-protocol built-ins)
+    DefaultContext->>PluginRegistry:  register_plugin() (for each external plug-in)
+    PluginRegistry->>PluginRegistry:  something()
+    Startup->>AdminServer:  create admin server if enabled
+    AdminServer->>AdminServer:  setup_context() (called from ???)
+    AdminServer->>PluginRegistry:  register_admin_routes() (for each external plug-in)
     John-->>Alice: Great!
     Alice-)John: See you later!
 ```
