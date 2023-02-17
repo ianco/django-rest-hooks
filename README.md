@@ -457,16 +457,36 @@ def find_and_fire_hook(event_name, instance, **kwargs):
 
 ```mermaid
 sequenceDiagram
-    Startup->>ArgParse: configure
+    Startup->>+ArgParse: configure
     ArgParse->>settings:  ["external_plugins"]
     ArgParse->>settings:  ["blocked_plugins"]
-    Startup->>DefaultContext:  build_context()
+    Startup->>+DefaultContext:  build_context()
     DefaultContext->>DefaultContext:  load_plugins()
-    DefaultContext->>PluginRegistry:  register_package() (for built-in protocols)
+    DefaultContext->>+PluginRegistry:  register_package() (for built-in protocols)
+    PluginRegistry->>PluginRegistry:  register_plugin() (for each sub-package)
     DefaultContext->>PluginRegistry:  register_plugin() (for non-protocol built-ins)
-    DefaultContext->>PluginRegistry:  register_plugin() (for each external plug-in)
-    PluginRegistry->>PluginRegistry:  something()
+  loop for each external plug-in
+    DefaultContext->>PluginRegistry:  register_plugin()
+  end
+  alt if a setup method is provided
+    PluginRegistry->>ExternalPlugIn:  setup()
+  else if routes and/or message_types are provided
+    PluginRegistry->>ExternalPlugIn:  routes()
+    PluginRegistry->>ExternalPlugIn:  message_types()
+  end
+  opt if definition is provided
+    PluginRegistry->>ExternalPlugIn:  definition()
+  end
+    DefaultContext->>PluginRegistry:  init_context()
+  alt if a setup method is provided
+    PluginRegistry->>ExternalPlugIn:  setup()
+  else if a setup method is NOT provided
+    PluginRegistry->>PluginRegistry:  load_protocols()
+  end
     Startup->>AdminServer:  create admin server if enabled
     Startup->>AdminServer:  setup_context() (called on each request)
-    AdminServer->>PluginRegistry:  register_admin_routes() (for each external plug-in)
+    AdminServer->>PluginRegistry:  register_admin_routes()
+  loop for each external plug-in
+    PluginRegistry->>ExternalPlugIn:  routes.register() (to register endpoints)
+  end
 ```
