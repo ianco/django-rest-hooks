@@ -467,6 +467,7 @@ sequenceDiagram
     DefaultContext->>PluginRegistry:  register_plugin() (for non-protocol built-ins)
   loop for each external plug-in
     DefaultContext->>PluginRegistry:  register_plugin()
+  end
   alt if a setup method is provided
     PluginRegistry->>ExternalPlugIn:  setup()
   else if routes and/or message_types are provided
@@ -475,7 +476,6 @@ sequenceDiagram
   end
   opt if definition is provided
     PluginRegistry->>ExternalPlugIn:  definition()
-  end
   end
     DefaultContext->>PluginRegistry:  init_context()
   alt if a setup method is provided
